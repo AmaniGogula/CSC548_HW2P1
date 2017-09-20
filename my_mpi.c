@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
+#include <socket.h>
 #include <netinet/in.h>
 #include <time.h>
 #include <sys/time.h>
@@ -20,7 +20,7 @@ int MPI_Init(int *argc, char ***argv)
 	if (!argc || !argv)
 		return MPI_FAILURE;
 	
-	if(argc < 4)
+	if(*argc < 4)
 		return MPI_FAILURE;
 	
 	rank = atoi((*argv)[1]);
@@ -38,8 +38,8 @@ int MPI_Init(int *argc, char ***argv)
 	char *line = malloc(sizeof(char)*line_size+1);
 	int i=0;
 	while(fgets(line, line_size, fh)){
-		hostname[i] = strtok(line, ' ');
-		port[i] = atoi(strtok(NULL, ' '));
+		hostname[i] = strtok(line, " ");
+		port[i] = atoi(strtok(NULL, " "));
 		printf("Hostname: %s, Port: %s\n", hostname[i], port[i]);
 		i++;
 	}
@@ -51,7 +51,7 @@ int MPI_Init(int *argc, char ***argv)
 		perror("Socket failed\n");
 		return MPI_FAILURE;
 	}
-	memset(address, 0, sizeof(struct sockaddr_in);
+	memset((void *)address, 0, sizeof(struct sockaddr_in));
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port[rank]);
@@ -74,9 +74,9 @@ int MPI_Comm_size ( MPI_Comm comm, int *size )
 	return MPI_SUCCESS;
 }
 
-int MPI_Comm_rank ( MPI_Comm comm, int *rank )
+int MPI_Comm_rank ( MPI_Comm comm, int *my_rank )
 {
-	*rank = rank;
+	*my_rank = rank;
 	return MPI_SUCCESS;
 }
 
@@ -126,7 +126,7 @@ int MPI_Recv( void *buf, int count, MPI_Datatype datatype, int source,
         if((sockfd = accept(socketServer, (struct sockaddr_in *)&source_addr, &srclen)) >= 0)
             break;
     }
-	bzero((char *)bugf, count+1);
+	bzero((char *)buf, count+1);
 	int n = read(sockfd, (char *)buf, count);
 	if (n < 0)
 		printf("Error reading from socket\n");
@@ -159,26 +159,26 @@ int MPI_Barrier(MPI_Comm comm)
 	
 	if(rank == 0)
 	{
-		MPI_Send("Barrier", 8, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+		MPI_Send("Barrier", 8, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 		MPI_Recv(msg, 8, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
 		printf("Received: %s, Rank: %d\n", msg, rank );
-		MPI_Send("DONE", 5, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+		MPI_Send("DONE", 5, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 	}
 	else if(rank == comm_size-1)
 	{
 		MPI_Recv(msg, 8, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
 		printf("Received: %s, Rank: %d \n",msg, rank);
-		MPI_Send("Barrier", 8, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+		MPI_Send("Barrier", 8, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 		MPI_Recv(msg, 5, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
 		printf("Received: %s, Rank: %d \n", msg, rank);
 	}
 	else
 	{
 		MPI_Recv(msg, 8, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-		MPI_Send("Barrier", 8, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+		MPI_Send("Barrier", 8, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 		printf("Received: %s, Rank: %d \n", msg,rank);
 		MPI_Recv(msg, 5, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-		MPI_Send("DONE", 5, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+		MPI_Send("DONE", 5, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 		printf("Received: %s, Rank: %d \n", msg, rank);
 	}
 	return MPI_SUCCESS;
