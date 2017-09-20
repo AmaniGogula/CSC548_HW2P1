@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "mpi.h"
+#include "my_mpi.h"
 
 #define MIN_SIZE 32 		/* Minimum message size */
 #define MAX_SIZE 2097152	/* Maximum message size */

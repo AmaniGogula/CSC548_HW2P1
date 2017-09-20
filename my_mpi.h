@@ -1,6 +1,6 @@
 
 #define MPI_FAILURE -1
-#define MAX_PROCESSES 16
+#define MAX_PROCESSORS 16
 #define MPI_SUCCESS 1
 #define MPI_COMM_WORLD 1
 

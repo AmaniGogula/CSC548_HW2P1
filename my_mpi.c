@@ -1,16 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <socket.h>
+#include <unistd.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <time.h>
+#include <sys/types.h>
 #include <sys/time.h>
+#include <netdb.h>
 
 #include "my_mpi.h"
 
 int rank;
 int comm_size;
-char *hostname[MAX_PROCESSES];
+char *hostname[MAX_PROCESSORS];
 int port[16];
 int socketServer;
 
@@ -51,7 +54,8 @@ int MPI_Init(int *argc, char ***argv)
 		perror("Socket failed\n");
 		return MPI_FAILURE;
 	}
-	memset((void *)address, 0, sizeof(struct sockaddr_in));
+	//memset((void *)address, 0, sizeof(struct sockaddr_in));
+        bzero((char *)&address, sizeof(address));
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port[rank]);
@@ -123,7 +127,7 @@ int MPI_Recv( void *buf, int count, MPI_Datatype datatype, int source,
 	int sockfd;
 	
 	while (1) {
-        if((sockfd = accept(socketServer, (struct sockaddr_in *)&source_addr, &srclen)) >= 0)
+        if((sockfd = accept(socketServer, (struct sockaddr *)&source_addr, &srclen)) >= 0)
             break;
     }
 	bzero((char *)buf, count+1);
