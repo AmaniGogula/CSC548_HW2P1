@@ -17,9 +17,29 @@ char *hostname[MAX_PROCESSORS];
 int port[16];
 int socketServer;
 
+void setHostname(char *str, int index)
+{
+//	printf("In set Hostname\n");
+	char delim = ' ';
+	int i=0, j=0;
+	char temp[32];
+	char p[6];
+	for(i=0; str[i] != 0 && str[i] != delim; i++)
+		temp[i] = str[i];
+	temp[i++]=0;
+	memcpy(hostname[index],temp, sizeof(temp));
+//	printf("Temp: %s\n", temp);
+//	printf("Hostname: %s\n", hostname[index]);
+	for(;str[i]!=0 && str[i] != delim; i++)
+		p[j++]=str[i];
+	p[j]=0;
+	port[index] = atoi(p);
+//	printf("End of set hostname\n");
+}
 
 int MPI_Init(int *argc, char ***argv)
 {
+  //      printf("In MPI_Init\n");
 	if (!argc || !argv)
 		return MPI_FAILURE;
 	
@@ -30,23 +50,28 @@ int MPI_Init(int *argc, char ***argv)
 	comm_size = atoi((*argv)[2]);
 	char *filename = (*argv)[3];
 	
+//	printf("File: %s\n", filename);
 	FILE *fh = fopen(filename, "r");
 	if(fh == NULL)
 	{
 		printf("File doesn't exist");
 		exit(-1);
 	}
-	
+  //      printf("Could open the file\n");	
 	int line_size = 32;
-	char *line = malloc(sizeof(char)*line_size+1);
+	//char *line = malloc(sizeof(char)*line_size+1);
+        char line[32];
 	int i=0;
 	while(fgets(line, line_size, fh)){
-		hostname[i] = strtok(line, " ");
-		port[i] = atoi(strtok(NULL, " "));
-		printf("Hostname: %s, Port: %s\n", hostname[i], port[i]);
+		hostname[i] = (char *)malloc(32*sizeof(char));
+		//hostname[i] = strtok(line, " ");
+		//port[i] = atoi(strtok(NULL, " "));
+         	setHostname(line, i);
+//		printf("Hostname: %s, Port: %d\n", hostname[i], port[i]);
 		i++;
 	}
 	fclose(fh);
+//	printf("Done setting Hostname, port\n");
 	
 	struct sockaddr_in address;
 	
@@ -114,7 +139,7 @@ int MPI_Send( void *buf, int count, MPI_Datatype datatype, int dest,
 	int n = write(sockfd, (char *)buf, sizeof(char) * count);
 	if (n < 0)
 		printf("Error writing to socket\n");
-	printf("Sent data: %s", (char *)buf);
+	//printf("Sent data: %s", (char *)buf);
 	close(sockfd);
 	return MPI_SUCCESS;
 }
@@ -134,7 +159,7 @@ int MPI_Recv( void *buf, int count, MPI_Datatype datatype, int source,
 	int n = read(sockfd, (char *)buf, count);
 	if (n < 0)
 		printf("Error reading from socket\n");
-	printf("Received: %s\n", (char *)buf);
+	//printf("Received: %s\n", (char *)buf);
 	close(sockfd);
 	return MPI_SUCCESS;
 }
@@ -165,25 +190,25 @@ int MPI_Barrier(MPI_Comm comm)
 	{
 		MPI_Send("Barrier", 8, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 		MPI_Recv(msg, 8, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-		printf("Received: %s, Rank: %d\n", msg, rank );
+//		printf("Received: %s, Rank: %d\n", msg, rank );
 		MPI_Send("DONE", 5, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 	}
 	else if(rank == comm_size-1)
 	{
 		MPI_Recv(msg, 8, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-		printf("Received: %s, Rank: %d \n",msg, rank);
+//		printf("Received: %s, Rank: %d \n",msg, rank);
 		MPI_Send("Barrier", 8, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
 		MPI_Recv(msg, 5, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-		printf("Received: %s, Rank: %d \n", msg, rank);
+//		printf("Received: %s, Rank: %d \n", msg, rank);
 	}
 	else
 	{
 		MPI_Recv(msg, 8, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
 		MPI_Send("Barrier", 8, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
-		printf("Received: %s, Rank: %d \n", msg,rank);
+//		printf("Received: %s, Rank: %d \n", msg,rank);
 		MPI_Recv(msg, 5, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
 		MPI_Send("DONE", 5, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
-		printf("Received: %s, Rank: %d \n", msg, rank);
+//		printf("Received: %s, Rank: %d \n", msg, rank);
 	}
 	return MPI_SUCCESS;
 }

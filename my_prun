@@ -6,6 +6,7 @@
 
 # Set some variables
 CMD=$1
+#NP=$2
 NODEFILE=nodefile1.txt
 OUTPUT=nodefile.txt
 PWD=$(pwd)
@@ -14,9 +15,11 @@ PWD=$(pwd)
 echo $SLURM_NODELIST | tr -d c | tr -d [ | tr -d ] | perl -pe 's/(\d+)-(\d+)/join(",",$1..$2)/eg' | awk 'BEGIN { RS=","} { print "c"$1 }' > $NODEFILE
 
 # For each item in the nodefile, add randomly generated port number.
+NP=0
 for node in `cat $NODEFILE`; do
   randomPort=`shuf -i 1024-10491 -n 1`
   echo $node $randomPort >> $OUTPUT 
+  (( NP++ ))
 done
 
 # For each item in the nodefile, connect via ssh and run the cmd.
@@ -26,7 +29,7 @@ done
 
 rank=0
 for curNode in `cat $NODEFILE`; do
-  ssh -n $curNode "cd $PWD;$CMD $curNode" & pid[$rank]=$!
+  ssh -n $curNode "cd $PWD;$CMD $rank $NP $OUTPUT" & pid[$rank]=$!
   (( rank++ ))
 done
 
@@ -37,4 +40,5 @@ for curNode in `cat $NODEFILE`; do
   (( rank++ ))
 done
 
-#rm $NODEFILE
+rm $NODEFILE
+rm $OUTPUT

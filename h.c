@@ -1,15 +1,17 @@
 #include "my_mpi.h"
    #include <stdio.h>
 
-   main(int argc, char *argv[])  {
-   int numtasks, rank, dest, source, rc, count, tag=1;
+   int main(int argc, char *argv[])  {
+   int numtasks, rank, dest, source, tag=1;
    char inmsg[64], outmsg[64]="hello",inmsg2[64];
    MPI_Status Stat;   // required variable for receive routines
 
+   printf("Before MPI Init\n");
    MPI_Init(&argc,&argv);
+   printf("MPI Initialization Done\n");
    MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+   printf("Number of tasks: %d\n", numtasks);
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
    printf(" my rank %d \n",rank);
 
    // task 0 sends to task 1 and waits to receive a return message
