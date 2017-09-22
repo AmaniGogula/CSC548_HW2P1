@@ -1,24 +1,37 @@
+####################################################################
+# FILE: my_prun
+# 
+# Single Author info:
+# agogula Amani Gogula 
+#
+# LAST REVISED: 09/22/2017
+#
+####################################################################
+
 #!/bin/bash
 
-#Usage: ./simple_my_prun [CMD]
+#Usage: ./my_prun [CMD]
 
 [ $# -ne 1 ] && { echo "Usage: $0 [cmd]"; exit 1; }
 
 # Set some variables
+#Binary to run on all nodes.
 CMD=$1
-#NP=$2
+#Iterable list of node names
 NODEFILE=nodefile1.txt
-OUTPUT=nodefile.txt
+#List of node names along with port numbers
+FILE=nodefile.txt
 PWD=$(pwd)
 
 # Parse $SLURM_NODELIST into an iterable list of node names
 echo $SLURM_NODELIST | tr -d c | tr -d [ | tr -d ] | perl -pe 's/(\d+)-(\d+)/join(",",$1..$2)/eg' | awk 'BEGIN { RS=","} { print "c"$1 }' > $NODEFILE
 
 # For each item in the nodefile, add randomly generated port number.
+#NP holds number of nodes.
 NP=0
 for node in `cat $NODEFILE`; do
   randomPort=`shuf -i 1024-10491 -n 1`
-  echo $node $randomPort >> $OUTPUT 
+  echo $node $randomPort >> $FILE 
   (( NP++ ))
 done
 
@@ -29,7 +42,7 @@ done
 
 rank=0
 for curNode in `cat $NODEFILE`; do
-  ssh -n $curNode "cd $PWD;$CMD $rank $NP $OUTPUT" & pid[$rank]=$!
+  ssh -n $curNode "cd $PWD;$CMD $rank $NP $FILE" & pid[$rank]=$!
   (( rank++ ))
 done
 
@@ -41,4 +54,4 @@ for curNode in `cat $NODEFILE`; do
 done
 
 rm $NODEFILE
-rm $OUTPUT
+rm $FILE

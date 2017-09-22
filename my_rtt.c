@@ -1,10 +1,10 @@
 /******************************************************************************
-* FILE: p1.c
+* FILE: my_rtt.c
 * 
 * Single Author info:
 * agogula Amani Gogula 
 *
-* LAST REVISED: 09/01/2017
+* LAST REVISED: 09/22/2017
 *
 ******************************************************************************/
 
@@ -14,7 +14,7 @@
 #include "my_mpi.h"
 
 #define MIN_SIZE 32 		/* Minimum message size */
-#define MAX_SIZE 262144	/* Maximum message size */
+#define MAX_SIZE 2097152	/* Maximum message size */
 #define REPEAT 10			/* Repeat 10 times for each message size */
 
 int main(int argc, char** argv)
@@ -56,8 +56,6 @@ int main(int argc, char** argv)
 		/* Repeat for "REPEAT" times */	
 		for(int iteration=0; iteration < REPEAT; iteration++)
 		{
-//			if(my_rank == 0)
-//				printf("Size: %d, Iteration: %d\n", size, iteration);
 			/* Set destination for message */
 			if(my_rank != (numprocs-1))
 				dest = my_rank + 1;
