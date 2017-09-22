@@ -1,0 +1,81 @@
+[agogula@c20 CSC548_HW2P1]$ ls
+my_mpi.c  my_mpi.h  my_prun  my_rtt.c  p1.Makefile
+[agogula@c20 CSC548_HW2P1]$ make -f p1.Makefile 
+mpicc -lm -O3 -W -o my_rtt my_mpi.c my_rtt.c
+[agogula@c20 CSC548_HW2P1]$ ./my_prun ./my_rtt
+Warning: Permanently added 'c20,10.4.1.21' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'c21,10.4.1.22' (ECDSA) to the list of known hosts.
+Waiting for connection
+      32 0.00183302 0.00054459 
+      64 0.00344589 0.00183727 
+     128 0.00488668 0.00344617 
+     256 0.00634236 0.00488702 
+     512 0.00782490 0.00634252 
+    1024 0.00928309 0.00782493 
+    2048 0.01076855 0.00928327 
+    4096 0.01228913 0.01076859 
+    8192 0.01385681 0.01228921 
+   16384 0.01543056 0.01385692 
+   32768 0.01702046 0.01543076 
+   65536 0.01862224 0.01702062 
+  131072 0.02030502 0.01862244 
+  262144 0.02212138 0.02030534 
+  524288 0.02420637 0.02212168 
+ 1048576 0.02675435 0.02420660 
+ 2097152 0.03065499 0.02675456 
+[agogula@c20 CSC548_HW2P1]$ exit
+exit
+[agogula@login ~]$ srun -N4 -n4 -p opteron --pty /bin/bash
+[agogula@c26 ~]$ cd  CSC548_HW2P1/
+[agogula@c26 CSC548_HW2P1]$ ./my_prun ./my_rtt
+Warning: Permanently added 'c26,10.4.1.27' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'c29,10.4.1.30' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'c28,10.4.1.29' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'c27,10.4.1.28' (ECDSA) to the list of known hosts.
+Waiting for connection
+      32 0.00392723 0.00057787 
+      64 0.00749779 0.00392731 
+     128 0.01106654 0.00749813 
+     256 0.01463085 0.01106656 
+     512 0.01820909 0.01463093 
+    1024 0.02178852 0.01820913 
+    2048 0.02543139 0.02178857 
+    4096 0.02914286 0.02543143 
+    8192 0.03295260 0.02914289 
+   16384 0.03689917 0.03295276 
+   32768 0.04092352 0.03689955 
+   65536 0.04500050 0.04092368 
+  131072 0.04953496 0.04500132 
+  262144 0.05433917 0.04953574 
+  524288 0.05952621 0.05433930 
+ 1048576 0.06610386 0.05952630 
+ 2097152 0.07605277 0.06610432 
+[agogula@c26 CSC548_HW2P1]$ exit
+exit
+[agogula@login ~]$ srun -N8 -n8 -p opteron --pty /bin/bash
+[agogula@c23 ~]$ cd CSC548_HW2P1/
+[agogula@c23 CSC548_HW2P1]$ ./my_prun ./my_rtt
+Warning: Permanently added 'c23,10.4.1.24' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'c24,10.4.1.25' (ECDSA) to the list of known hosts.
+Warning: Permanently added 'c25,10.4.1.26' (ECDSA) to the list of known hosts.
+      32 0.00882989 0.00033548 
+      64 0.01748978 0.00883060 
+     128 0.02609158 0.01748997 
+     256 0.03475430 0.02609162 
+     512 0.04342185 0.03475452 
+    1024 0.05208050 0.04342193 
+    2048 0.06078437 0.05208051 
+    4096 0.06969025 0.06078439 
+    8192 0.07901790 0.06969039 
+   16384 0.08848471 0.07901803 
+   32768 0.09838584 0.08848490 
+   65536 0.10844938 0.09838595 
+  131072 0.11891683 0.10844946 
+  262144 0.13022137 0.11891721 
+  524288 0.14263588 0.13022144 
+ 1048576 0.15824705 0.14263601 
+ 2097152 0.18288607 0.15824819 
+Waiting for connection
+[agogula@c23 CSC548_HW2P1]$ exit
+exit
+[agogula@login ~]$ 

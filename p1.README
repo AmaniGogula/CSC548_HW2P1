@@ -1,0 +1,48 @@
+my_mpi.h, my_mpi.c : MPI library implementation with custom implementation of MPI_Init, MPI_Send, MPI_Recv, MPI_Barrier, MPI_Finalize, MPI_Comm_size, MPI_Comm_rank
+my_prun            : Bash script to generate nodefile from SLURM_NODELIST and ssh to launch jobs on ARC nodes. 
+my_rtt.c           : Test program(HW1 p1)
+p1.Makefile		   : Make file to compile program and generae my_rtt binary
+
+Compilation 
+-----------
+make -f p1.Makefile
+
+Run
+-----------
+Use my_prun like you would prun. Enter the command
+
+	./my_prun ./my_rtt
+	
+to run my_rtt.c binary across all nodes.
+
+
+my_prun:
+-----------------
+- Bash script that loops through the $SLURM_NODELIST, and runs a command via ssh (provided in the argument list)
+
+my_mpi.h:
+-----------------
+- Header file to include in test program and implemented in my_mpi.c 
+- Includes MPI functions prototypes and constants required.
+
+my_mpi.c:
+-----------------
+- C code which is implementation of all MPI functions declared in my_mpi.h
+- MPI_Init() 	  : Takes in parameters rank, size(number of nodes), nodefile from command line passed by my_prun. 
+					Initializes global variables for a node like rank, size, read and save all hosts, corresponding port numbers, creates server socket for listening incoming client requests.
+- MPI_Send() 	  : Creates a socket and connects with destination server socket and sends data.
+- MPI_Recv() 	  : Listens on server socket and receive data from connected client socket.
+- MPI_Comm_rank() : Returns rank from global variable
+- MPI_Comm_size() : Returns size from global variable
+- MPI_Barrier()   : Implemented token ring synchronization mechanism where a "Barrier" message is communicated across all nodes in chain and then final "DONE" message
+- MPI_Finalize()  : MPI_Barrier and then close server socket.
+
+my_rtt.c:
+-----------------
+- Test program which is p2 of HW1 with just modification in using my_mpi.h instead of mpi.hosts
+
+Results:
+-----------------
+- Ran on 2, 4, 8 nodes with one process each.
+- Takes significantly more time compared to HW1 p2 times.
+- Pattern observed is same as that of HW1 p2 
